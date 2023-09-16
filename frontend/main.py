@@ -21,7 +21,6 @@ markdown = """
 <|card|
 
 Ingredient Name: <|{value}|input|label=Ingredient Name|on_change=on_ingredient_change|>
-Ingredient Price: <|{number}|number|label=Price|on_change=on_ingredient_price_change|>
 <|Add Ingredient|button|on_action=add_ingredient|>
 |>
 
@@ -32,9 +31,6 @@ Flyer: <|{path}|file_selector|label=Upload Flyer|extensions=.png,.jpg|on_action=
 # state modification
 def on_ingredient_change(state):
     current_ingredient.set_name(state.value)
-
-def on_ingredient_price_change(state):
-    current_ingredient.set_price(state.number)
 
 def add_ingredient():
     to_add = Ingredient.from_existing(current_ingredient)
