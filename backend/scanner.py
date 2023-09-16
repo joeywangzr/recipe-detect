@@ -47,11 +47,11 @@ def extract_flyer(image_uri: str) -> str:
       'image': {'source': {'image_uri': image_uri}},
       'features': [{'type_': vision.Feature.Type.TEXT_DETECTION}]
     })
-    
-    return response.text_annotations[0].description
+
+    return str(response.text_annotations)
 
 if __name__ == "__main__":
-    flyer_text = extract_flyer("https://raw.githubusercontent.com/recipede/recipe-detect/main/backend/grocery/crop_5.jpg")
+    flyer_text = str(extract_flyer("https://raw.githubusercontent.com/recipede/recipe-detect/main/backend/grocery/crop_5.jpg"))
     print(flyer_text)
     print(extract_grocery(flyer_text))
     print(is_food(flyer_text))
