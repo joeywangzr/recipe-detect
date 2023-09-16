@@ -2,6 +2,7 @@
 Taipy frontend for application.
 """
 import taipy
+import os
 
 from models.ingredient import Ingredient
 
@@ -42,4 +43,8 @@ def load_file(state):
     mypath = state.path
     print(mypath)
 
-taipy.Gui(page=markdown).run()
+taipy.Gui(page=markdown).run(
+    title="Let us cook",
+    host='0.0.0.0',
+    port=os.environ.get('PORT', '5000'),
+)
