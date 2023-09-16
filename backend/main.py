@@ -1,7 +1,5 @@
-from PIL import Image
 import cv2
 import numpy as np
-from matplotlib import pyplot as plt
 
 img = cv2.imread('./backend/flyers/flyer1.png')
 gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
