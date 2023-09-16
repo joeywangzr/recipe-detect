@@ -11,11 +11,11 @@ EDAMAM_API_KEY = os.getenv("EDAMAM_API_KEY")
 EDAMAM_API_URL = "https://api.edamam.com/api/recipes/v2"
 EDAMAM_APP_ID = os.getenv("EDAMAM_APP_ID")
 
-def generate_llm_recipe(ingredients: List[str]) -> str:
+def generate_llm_recipes(ingredients: List[str]) -> str:
     if COHERE_API_KEY == None:
         raise Exception("API key not found.")
     co = cohere.Client(COHERE_API_KEY)
-    prompt = "Give me a recipe in a JSON format using only the following ingredients:"
+    prompt = "Give me a list of recipe in JSON format that use the following ingredients: "
 
     for ingredient in ingredients:
         prompt +=  "\n " + ingredient
@@ -51,5 +51,4 @@ def get_edamam_recipe(ingredients: List[str]) -> str:
 
 if __name__ == "__main__":
     ingredients = ["ham", "rice", "chicken", "teriyaki"]
-    generate_llm_recipe(ingredients)
     #get_edamam_recipe(ingredients)
