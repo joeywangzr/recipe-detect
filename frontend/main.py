@@ -2,6 +2,7 @@
 Taipy frontend for application.
 """
 import taipy
+import os
 
 from models.ingredient import Ingredient
 
@@ -21,7 +22,6 @@ markdown = """
 <|card|
 
 Ingredient Name: <|{value}|input|label=Ingredient Name|on_change=on_ingredient_change|>
-Ingredient Price: <|{number}|number|label=Price|on_change=on_ingredient_price_change|>
 <|Add Ingredient|button|on_action=add_ingredient|>
 |>
 
@@ -33,9 +33,6 @@ Flyer: <|{path}|file_selector|label=Upload Flyer|extensions=.png,.jpg|on_action=
 def on_ingredient_change(state):
     current_ingredient.set_name(state.value)
 
-def on_ingredient_price_change(state):
-    current_ingredient.set_price(state.number)
-
 def add_ingredient():
     to_add = Ingredient.from_existing(current_ingredient)
     pantry.append(to_add)
@@ -46,4 +43,8 @@ def load_file(state):
     mypath = state.path
     print(mypath)
 
-taipy.Gui(page=markdown).run()
+taipy.Gui(page=markdown).run(
+    title="Let us cook",
+    host='0.0.0.0',
+    port=os.environ.get('PORT', '5000'),
+)
