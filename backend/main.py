@@ -7,10 +7,11 @@ from os.path import join, dirname
 from flask import Flask
 
 from database import db
-from routes import recipe_routes
+from routes import recipe_routes, processing_routes
 
 app = Flask(__name__)
 app.register_blueprint(recipe_routes)
+app.register_blueprint(processing_routes)
 
 dotenv_path = join(dirname(__file__), '.env')
 load_dotenv(dotenv_path=dotenv_path)
