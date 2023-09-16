@@ -2,11 +2,13 @@
 Taipy frontend for application.
 """
 import taipy
+import requests
 import os
 
 from models.ingredient import Ingredient
 
 # state
+file_path = None
 path = None
 pantry = []
 current_ingredient = Ingredient()
@@ -21,11 +23,16 @@ markdown = """
 ## Pantry
 <|card|
 
-Ingredient Name: <|{value}|input|label=Ingredient Name|on_change=on_ingredient_change|>
+Ingredient Name: <|{value}|input|label=Ingredient Name    |on_change=on_ingredient_change|>
 <|Add Ingredient|button|on_action=add_ingredient|>
 |>
 
-Flyer: <|{path}|file_selector|label=Upload Flyer|extensions=.png,.jpg|on_action=load_file|>
+## Flyer
+<|card|
+Flyer: <|{path}|file_selector|label=Upload Flyer    |extensions=.png,.jpg|on_action=load_file|>
+<|Let it cook|button|on_action=generate_recipes|>
+|>
+
 
         
 """
@@ -40,8 +47,17 @@ def add_ingredient():
     print(pantry)
 
 def load_file(state):
-    mypath = state.path
-    print(mypath)
+    global file_path
+    file_path = state.path
+
+def generate_recipes():
+    global file_path
+    global pantry
+    payload = {
+        "path": file_path,
+        "pantry": pantry
+    }
+    response = requests.post("http://localhost:8080/process", json=payload)
 
 taipy.Gui(page=markdown).run(
     title="Let us cook",
