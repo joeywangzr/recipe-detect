@@ -13,3 +13,5 @@ taipy-core==2.4.0
 taipy-gui==2.4.0
 taipy-rest==2.4.0
 taipy-templates==2.4.0
+python-dotenv==0.20.0
+cohere==4.26.1
