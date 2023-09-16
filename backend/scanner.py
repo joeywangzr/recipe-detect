@@ -29,7 +29,7 @@ def extract_grocery(flyer_text: str) -> str:
         raise Exception("API key not found.")
     co = cohere.Client(COHERE_API_KEY)
     prompt = "The following is text from a grocery store flyer that sells conventional household goods and food. Determine what the product name is: " +flyer_text
-    prompt += "\n\nPlease respond with only the kind of food or product that the item is."
+    prompt += "\n\nPlease respond with only the name of the product." #kind of food or product that the item is."#"
     response = co.generate(  
         model='command-nightly',  
         prompt = prompt,  
@@ -51,7 +51,7 @@ def extract_flyer(image_uri: str) -> str:
     return response.text_annotations[0].description
 
 if __name__ == "__main__":
-    flyer_text = extract_flyer("https://raw.githubusercontent.com/recipede/recipe-detect/main/backend/grocery/crop_3.jpg")
+    flyer_text = extract_flyer("https://raw.githubusercontent.com/recipede/recipe-detect/main/backend/grocery/crop_5.jpg")
     print(flyer_text)
     print(extract_grocery(flyer_text))
     print(is_food(flyer_text))
