@@ -31,6 +31,14 @@ selected_name = None
 selected_ingredients = {}
 selected_steps = {}
 
+pantry_items = []
+cursor = pantry.find({})
+for item in cursor:
+    pantry_items.append(item["name"])
+pantry_list = pd.DataFrame([{
+    "Item": i
+} for i in pantry_items]) if len(pantry_items) != 0 else pd.DataFrame(data, columns=['Items'])
+
 recipe_response = requests.get("http://localhost:8080/recipes/")
 recipes_response_body = recipe_response.json()
 recipes_list = pd.DataFrame([{
@@ -69,9 +77,10 @@ markdown = """
 <|card|
 <|{value}|input|label=Ingredient Name|on_change=on_ingredient_change|>
 <|Add Ingredient|button|on_action=add_ingredient|>
+<|{pantry_list}|table|show_all|rebuild|height=80%|on_action=populate_pantry|>
 |>
 
-### Prepare to Cook 🍳
+### Cookin' Time 🍳
 <|card|
 <|{path}|file_selector|label=Upload Flyer|extensions=.png,.jpg|on_action=load_file|>
 <|Let it cook!|button|on_action=generate_recipes|>
@@ -93,6 +102,16 @@ markdown = """
 """
 
 # state modification
+def populate_pantry(state):
+    pantry_items = []
+    cursor = pantry.find({})
+    for item in cursor:
+        pantry_items.append(item["name"])
+    state.pantry_list.drop(state.pantry_list.index, inplace=True)
+    state.pantry_list = pd.DataFrame([{
+        "Item": i
+    } for i in pantry_items]) if len(pantry_items) != 0 else pd.DataFrame(data, columns=['Items'])
+
 def on_ingredient_change(state):
     current_ingredient.set_name(state.value)
 
@@ -114,7 +133,6 @@ def display_recipe_modal(state, id, action, payload):
                 print(str(e))
                 notify(state, "error", str(e))
         st.show_recipe_modal = False
-    
 
 def update_ingredient_display(new_ingredients: 'list[Ingredient]'):
     global status
