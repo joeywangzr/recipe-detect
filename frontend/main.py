@@ -25,7 +25,11 @@ current_ingredient = Ingredient()
 # bindings
 value = None
 number = None
-open = False
+show_recipe_modal = False
+selected_recipe = {}
+selected_name = None
+selected_ingredients = []
+selected_steps = []
 
 markdown = """
 # Recipe Architech
@@ -48,11 +52,27 @@ markdown = """
 |>
 
 <|{"https://media4.giphy.com/media/WRXNJYnmTfaCUsU4Sw/giphy.gif?cid=6c09b952mdjomg6udjcjs7f2ybbepnrcks3zk55ymzfnt7u6&ep=v1_internal_gif_by_id&rid=giphy.gif&ct=s"}|image|>
+<|{show_recipe_modal}|dialog|on_action=display_recipe_modal|title=Recipe Display|labels=Save Recipe;Cancel|
+<|
+<|{selected_name}|>\n
+Ingredients\n
+Steps
+|>
+|>
 """
 
 # state modification
 def on_ingredient_change(state):
     current_ingredient.set_name(state.value)
+
+def display_recipe_modal(state, action, payload):
+    print("attempt")
+    with state as st:
+        print(st, action, payload)
+        print("AMONGUS", dict(st.selected_recipe))
+        data_display = dict(st.selected_recipe)
+        st.show_recipe_modal = False
+    
 
 def update_ingredient_display(new_ingredients: 'list[Ingredient]'):
     global status
@@ -74,11 +94,17 @@ def load_file(state):
 
 def on_recipe_click(state, var_name, action, payload):
     try:
-        idx = payload["index"]
         print(payload)
-        print(data[idx])
+        idx = payload["index"]
+        row = state.data.iloc[idx].to_dict()
+        print(row)
+        state.selected_recipe = row
+        state.selected_name = row["Name"]
+        state.selected_ingredients = row["Ingredients"]
+        state.selected_steps = row["Steps"]
+        state.show_recipe_modal = True
     except Exception as e:
-        print(e)
+        print("Recipe Error Click", str(e))
 
 def generate_recipes(state):
     pantry_items = []
@@ -113,8 +139,8 @@ def generate_recipes(state):
             recipe_display["Name"].append(name)
             recipe_display["Ingredients"].append(ingredients)
             recipe_display["Steps"].append(steps)
-        state.data = pd.DataFrame(recipe_display)
-        print(data)
+        data = pd.DataFrame(recipe_display)
+        state.data = data
     except Exception as e:
         notify(state, "error", str(e))
     

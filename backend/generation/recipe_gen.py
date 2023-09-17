@@ -36,7 +36,7 @@ def generate_llm_recipes(ingredients: List[str]) -> str:
 
     for ingredient in ingredients:
         prompt +=  "\n " + ingredient
-    prompt += "\n Give a JSON format of an array with objects with property keys \"name\", \"ingredients\", \"steps\". Keep your answer relatively short. Make sure you don't leave trailing commas for the end of arrays." 
+    prompt += "\n Give a JSON format of an array with objects with property keys \"name\", \"ingredients\", \"steps\". Keep your answer relatively short. Separate the steps into individual strings in their respective arrays. Make sure you don't leave trailing commas for the end of arrays. " 
     response = co.generate(  
         model='command-nightly',  
         prompt = prompt,  
