@@ -44,5 +44,6 @@ def crop_flyer(path):
                 
                 counter += 1
 
+crop_flyer('./flyers/flyer2.png')
 # cv2.imwrite("box_found.png", copy)
 # cv2.waitKey(0)
