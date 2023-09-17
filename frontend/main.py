@@ -2,7 +2,7 @@
 Taipy frontend for application.
 """
 import taipy
-from taipy.gui import notify
+from taipy.gui import notify, navigate
 import requests
 import os
 import pandas as pd
@@ -30,6 +30,37 @@ selected_recipe = {}
 selected_name = None
 selected_ingredients = {}
 selected_steps = {}
+
+recipe_response = requests.get("http://localhost:8080/recipes/")
+recipes_response_body = recipe_response.json()
+recipes_list = pd.DataFrame([{
+    "Recipe Name": r["name"],
+    "Ingredients": ", ".join(r["ingredients"]),
+    "Steps": " \n".join(r["steps"])
+} for r in recipes_response_body]) if recipes_response_body is not None else [] 
+
+root = """
+<|menu|label=Menu|lov={[('home', 'Home'), ('recipes', 'My Recipes')]}|on_action=on_menu|>
+"""
+
+
+recipe_page = """
+## My Recipes
+<|{recipes_list}|table|show_all|rebuild|height=80%|>
+"""
+
+def on_menu(state, var_name, function_name, info):
+    page = info['args'][0]
+    navigate(state, to=page)
+
+def populate_recipe_page(state):
+    recipe_response = requests.get("http://localhost:8080/recipes/")
+    recipes_response_body = recipe_response.json()
+    state.recipes_list = pd.DataFrame([{
+        "Recipe Name": r["name"],
+        "Ingredients": ", ".join(r["ingredients"]),
+        "Steps": " \n".join(r["steps"])
+    } for r in recipes_response_body]) if recipes_response_body is not None else []
 
 markdown = """
 # Recipe Architech
@@ -75,7 +106,7 @@ def display_recipe_modal(state, id, action, payload):
                 response = requests.post("http://localhost:8080/recipes/insert", json=recipe_data)
                 
                 if response.status_code == 200:
-                    print("HI")
+                    populate_recipe_page(state)
                     notify(state, "success", f"Recipe {recipe_data[0]['Name']} succesfully saved!")
                 else:
                     notify(state, "error", f"Recipe {recipe_data[0]['Name']} could not be saved.")
@@ -153,8 +184,14 @@ def generate_recipes(state):
         state.data = data
     except Exception as e:
         notify(state, "error", str(e))
+    
+pages = {
+    "/": root,
+    "home": markdown,
+    "recipes": recipe_page
+}
 
-taipy.Gui(page=markdown).run(
+taipy.Gui(pages=pages).run(
     title="Let us cook",
     host='0.0.0.0',
     port=os.environ.get('PORT', '5000'),
