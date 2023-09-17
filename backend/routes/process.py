@@ -3,6 +3,7 @@ Routes for processing an image.
 """
 
 import os
+import json
 from flask import Blueprint, request, Response
 
 from generation.scanner import extract_flyer, is_food, extract_grocery
@@ -33,6 +34,9 @@ def process_image():
         groceries.append(flyer_groceries)
     
     groceries.extend(pantry)
-    result = generate_llm_recipes(groceries)
+    recipes_data = generate_llm_recipes(groceries)
+    result = recipes_data.split("json")[1]
+    result = result.strip(" ").strip("`")
+    print(result)
 
-    return {"result": result}
+    return {"result": json.loads(result)}

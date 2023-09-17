@@ -2,8 +2,10 @@
 Taipy frontend for application.
 """
 import taipy
+from taipy.gui import notify
 import requests
 import os
+import pandas as pd
 
 from models.ingredient import Ingredient
 
@@ -12,11 +14,14 @@ file_path = None
 path = None
 pantry = []
 status = []
+generated_ingredients = []
+data = pd.DataFrame([])
 current_ingredient = Ingredient()
 
 # bindings
 value = None
 number = None
+open = False
 
 markdown = """
 # Recipede.tech
@@ -24,14 +29,19 @@ markdown = """
 ## Pantry
 <|card|
 
-Ingredient Name: <|{value}|input|label=Ingredient Name    |on_change=on_ingredient_change|>
+Ingredient Name: <|{value}|input|label=Ingredient Name|on_change=on_ingredient_change|>
 <|Add Ingredient|button|on_action=add_ingredient|>
 |>
 
 ## Flyer
 <|card|
-Flyer: <|{path}|file_selector|label=Upload Flyer    |extensions=.png,.jpg|on_action=load_file|>
+Flyer: <|{path}|file_selector|label=Upload Flyer|extensions=.png,.jpg|on_action=load_file|>
 <|Let it cook|button|on_action=generate_recipes|>
+|>
+
+## Recipes
+<|card|
+<|{data}|table|columns=Name|show_all|rebuild|on_action=on_recipe_click|>
 |>
 
 
@@ -55,23 +65,53 @@ def load_file(state):
     global file_path
     file_path = state.path
 
+def on_recipe_click(state, var_name, action, payload):
+    try:
+        idx = payload["index"]
+        print(payload)
+        print(data[idx])
+    except Exception as e:
+        print(e)
 
-def generate_recipes():
+
+def generate_recipes(state):
     global file_path
-    global pantry
+    global data
     payload = {
         "path": file_path,
         "pantry": [p.name for p in pantry]
     }
-    response = requests.post("http://localhost:8080/process", json=payload)
-    data = response.json()
-    result = data.get('result')
-    print(result)
+    try:
+        recipes_response = requests.post("http://localhost:8080/process", json=payload)
+        recipe_data = recipes_response.json()
+        recipes_result = recipe_data.get('result')
 
-    print(data)
+        recipe_display = {
+            "Name": [],
+            "Ingredients": [],
+            "Steps": []
+        }
+        print(recipes_result)
+        for recipe in recipes_result:
+            name = recipe.get("name", "")
+
+            ingredients = recipe.get("ingredients", [])
+            steps = recipe.get("steps", [])
+            print(name, ingredients)
+            if name is None or name == "":
+                continue
+            recipe_display["Name"].append(name)
+            recipe_display["Ingredients"].append(ingredients)
+            recipe_display["Steps"].append(steps)
+        state.data = pd.DataFrame(recipe_display)
+        print(data)
+    except Exception as e:
+        notify(state, "error", str(e))
+    
 
 taipy.Gui(page=markdown).run(
     title="Let us cook",
     host='0.0.0.0',
     port=os.environ.get('PORT', '5000'),
+    use_reloader=True
 )
