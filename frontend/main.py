@@ -65,19 +65,19 @@ def populate_recipe_page(state):
 markdown = """
 # Recipe Architech
 
-## My Pantry
+### My Pantry 🍽️
 <|card|
 <|{value}|input|label=Ingredient Name|on_change=on_ingredient_change|>
 <|Add Ingredient|button|on_action=add_ingredient|>
 |>
 
-## Prepare to Cook
+### Prepare to Cook 🍳
 <|card|
 <|{path}|file_selector|label=Upload Flyer|extensions=.png,.jpg|on_action=load_file|>
 <|Let it cook!|button|on_action=generate_recipes|>
 |>
 
-## Recipes
+### Recipes
 <|card|
 <|{data}|table|columns=Name|show_all|rebuild|on_action=on_recipe_click|>
 |>
