@@ -32,15 +32,15 @@ def generate_llm_recipes(ingredients: List[str]) -> str:
     if COHERE_API_KEY == None:
         raise Exception("API key not found.")
     co = cohere.Client(COHERE_API_KEY)
-    prompt = "Give me a list of recipes with steps in JSON format that use the following ingredients: "
+    prompt = "Give me a list of recipes (maximum 3) with steps in JSON format that use the following ingredients: "
 
     for ingredient in ingredients:
         prompt +=  "\n " + ingredient
-
+    prompt += "\n Give a JSON format of an array with objects with property keys \"name\", \"ingredients\", \"steps\". Keep your answer relatively short. Make sure you don't leave trailing commas for the end of arrays." 
     response = co.generate(  
         model='command-nightly',  
         prompt = prompt,  
-        max_tokens=1000,  
+        max_tokens=2000,  
         temperature=0.750)
 
     if response.generations == None:

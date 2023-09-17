@@ -20,7 +20,7 @@ def insert_recipes():
     for raw in data:
         recipe_name = raw.get("name")
         recipe_ingredients = raw.get("ingredients") if raw.get("ingredients") is not None else []
-        recipe_steps = raw.get("steps") if raw.get("steps") is not None else ""
+        recipe_steps = raw.get("steps") if raw.get("steps") is not None else []
         if recipe_name is None or recipe_name == '':
             return Response({"status": "error", "error": "Recipe name cannot be null."}, status=400)
         recipe = Recipe(

@@ -32,7 +32,7 @@ def generate_llm_recipes(ingredients: List[str]) -> str:
     if COHERE_API_KEY == None:
         raise Exception("API key not found.")
     co = cohere.Client(COHERE_API_KEY)
-    prompt = "Give me a list of recipe in JSON format that use the following ingredients: "
+    prompt = "Ignoring non-food and inappropriate items, give me a list of recipes in JSON format that use the following ingredients: "
 
     for ingredient in ingredients:
         prompt +=  "\n " + ingredient
