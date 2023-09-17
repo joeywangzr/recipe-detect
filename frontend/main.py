@@ -28,8 +28,8 @@ number = None
 show_recipe_modal = False
 selected_recipe = {}
 selected_name = None
-selected_ingredients = []
-selected_steps = []
+selected_ingredients = {}
+selected_steps = {}
 
 markdown = """
 # Recipe Architech
@@ -52,11 +52,11 @@ markdown = """
 |>
 
 <|{"https://media4.giphy.com/media/WRXNJYnmTfaCUsU4Sw/giphy.gif?cid=6c09b952mdjomg6udjcjs7f2ybbepnrcks3zk55ymzfnt7u6&ep=v1_internal_gif_by_id&rid=giphy.gif&ct=s"}|image|>
-<|{show_recipe_modal}|dialog|on_action=display_recipe_modal|title=Recipe Display|labels=Save Recipe;Cancel|
+<|{show_recipe_modal}|dialog|on_action=display_recipe_modal|title=Recipe Display|labels=Save Recipe;Cancel|width=80%|
 <|
 <|{selected_name}|>\n
-Ingredients\n
-Steps
+<|{selected_ingredients}|table|rebuild|show_all|>
+<|{selected_steps}|table|rebuild|show_all|>
 |>
 |>
 """
@@ -65,12 +65,23 @@ Steps
 def on_ingredient_change(state):
     current_ingredient.set_name(state.value)
 
-def display_recipe_modal(state, action, payload):
-    print("attempt")
+def display_recipe_modal(state, id, action, payload):
     with state as st:
         print(st, action, payload)
-        print("AMONGUS", dict(st.selected_recipe))
-        data_display = dict(st.selected_recipe)
+        # save down to cockroach
+        if payload['args'][0] == 0:
+            try:
+                recipe_data = [dict(state.selected_recipe)]
+                response = requests.post("http://localhost:8080/recipes/insert", json=recipe_data)
+                
+                if response.status_code == 200:
+                    print("HI")
+                    notify(state, "success", f"Recipe {recipe_data[0]['Name']} succesfully saved!")
+                else:
+                    notify(state, "error", f"Recipe {recipe_data[0]['Name']} could not be saved.")
+            except Exception as e:
+                print(str(e))
+                notify(state, "error", str(e))
         st.show_recipe_modal = False
     
 
@@ -100,8 +111,8 @@ def on_recipe_click(state, var_name, action, payload):
         print(row)
         state.selected_recipe = row
         state.selected_name = row["Name"]
-        state.selected_ingredients = row["Ingredients"]
-        state.selected_steps = row["Steps"]
+        state.selected_ingredients = {"Ingredients": row["Ingredients"]}
+        state.selected_steps = {"Steps": row["Steps"]}
         state.show_recipe_modal = True
     except Exception as e:
         print("Recipe Error Click", str(e))
