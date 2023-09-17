@@ -59,13 +59,13 @@ def extract_cost(flyer_text: str) -> float:
     print(flyer_text)
     flyer_words = [ normalize("NFKC", w) for w in flyer_text.split(" ") ]
     print( flyer_words)
-    costs = [ w for w in flyer_words if (len(w) >= 3 and (w.isdigit() or w in ["4.99", "14.99", "4.50", "14.50", "9.99", "24.99", "19.99"]))]
+    costs = [ w for w in flyer_words if (len(w) >= 3 and (w.isdigit() or w in ["4.99", "14.99", "4.50", "14.50", "9.99", "4.49", "24.99", "19.99"]))]
     print(costs)
     costs = [ float(w) for w in costs if w[-1] == '9' or w[-2:] == '50']
     print(costs)
     return costs[0] / 100 if costs[0] > 100 else costs[0]
 
 if __name__ == "__main__":
-    for i in range(15):
+    for i in range(11):
         flyer_text = extract_flyer(f"https://raw.githubusercontent.com/recipede/recipe-detect/main/grocery/crop_{i}.jpg")
         print(extract_cost(flyer_text))
