@@ -55,9 +55,9 @@ def extract_cost(flyer_text: str) -> float:
     flyer_text = flyer_text.replace("\\\n", " ")
     flyer_text = flyer_text.replace("\n", " ")
     flyer_words = flyer_text.split(" ")
-    costs = [ float(w) for w in flyer_words if (len(w) >= 3 and w[-1] == '9') ]
+    costs = [ float(w) for w in flyer_words if (len(w) >= 3 and (w[-1] == '9') or w[-2:] == "50") ]
     return costs[0] / 100
 
 if __name__ == "__main__":
-    flyer_text = extract_flyer("https://raw.githubusercontent.com/recipede/recipe-detect/main/backend/grocery/crop_14.jpg")
+    flyer_text = extract_flyer("https://raw.githubusercontent.com/recipede/recipe-detect/main/backend/flyers/flyer3.png")
     print(extract_cost(flyer_text))
