@@ -22,7 +22,7 @@ class Recipe(db.Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String, nullable=False, unique=True)
     ingredients: Mapped[list] = mapped_column(ARRAY(String), nullable=False)
-    steps: Mapped[str] = mapped_column(String, nullable=False)
+    steps: Mapped[list] = mapped_column(ARRAY(String), nullable=False)
     
     def to_json(self):
         return {
