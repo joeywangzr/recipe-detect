@@ -11,6 +11,7 @@ from models.ingredient import Ingredient
 file_path = None
 path = None
 pantry = []
+status = []
 current_ingredient = Ingredient()
 
 # bindings
@@ -40,6 +41,10 @@ Flyer: <|{path}|file_selector|label=Upload Flyer    |extensions=.png,.jpg|on_act
 def on_ingredient_change(state):
     current_ingredient.set_name(state.value)
 
+def update_ingredient_display(new_ingredients: 'list[Ingredient]'):
+    global status
+    status = [(("info", ingredient.name)) for ingredient in new_ingredients]
+
 def add_ingredient():
     to_add = Ingredient.from_existing(current_ingredient)
     pantry.append(to_add)
@@ -50,14 +55,20 @@ def load_file(state):
     global file_path
     file_path = state.path
 
+
 def generate_recipes():
     global file_path
     global pantry
     payload = {
         "path": file_path,
-        "pantry": pantry
+        "pantry": [p.name for p in pantry]
     }
     response = requests.post("http://localhost:8080/process", json=payload)
+    data = response.json()
+    result = data.get('result')
+    print(result)
+
+    print(data)
 
 taipy.Gui(page=markdown).run(
     title="Let us cook",

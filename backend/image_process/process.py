@@ -30,9 +30,7 @@ def crop_flyer(path):
     counter = 0
     for index, c in enumerate(contours[0]):
         area = cv2.contourArea(c)
-        print(area, min_area)
         if area > min_area:
-            print(f"./grocery/crop_{counter}.jpg")
             approx = cv2.approxPolyDP(c,1,True)
             if len(approx) < 200:
                 (x,y,w,h) = cv2.boundingRect(c)
