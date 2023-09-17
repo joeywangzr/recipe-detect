@@ -1,0 +1,29 @@
+@font-face {
+    font-family: "ClashGrotesk";
+    src: url("./fonts/ClashGrotesk-Regular.otf") format("opentype");
+}
+
+html {
+    font-family: "ClashGrotesk";
+    text-align: center;
+    height: auto;
+}
+
+/* body {
+    background-image: url("./images/paper.jpg");
+    background-color: none;
+} */
+
+.card {
+    height: auto;
+    margin: auto;
+    width: 40%;
+}
+
+.main{
+    width: 70%;
+}
+
+.taipy-button, .taipy-input, .taipy-file-selector {
+    margin-left: 10px;
+}

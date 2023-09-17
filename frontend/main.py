@@ -6,13 +6,17 @@ from taipy.gui import notify
 import requests
 import os
 import pandas as pd
-
+from pymongo import MongoClient
 from models.ingredient import Ingredient
+
+CONNECTION_STRING = "mongodb+srv://j2795wan:hackthenorth2023@cluster0.mibkmem.mongodb.net/?retryWrites=true&w=majority"
+client = MongoClient(CONNECTION_STRING)
+mydb = client['Cluster0']
+pantry = mydb["pantry"]
 
 # state
 file_path = None
 path = None
-pantry = []
 status = []
 generated_ingredients = []
 data = pd.DataFrame([])
@@ -24,19 +28,18 @@ number = None
 open = False
 
 markdown = """
-# Recipede.tech
+# Recipe Architech
 
-## Pantry
+## My Pantry
 <|card|
-
-Ingredient Name: <|{value}|input|label=Ingredient Name|on_change=on_ingredient_change|>
+<|{value}|input|label=Ingredient Name|on_change=on_ingredient_change|>
 <|Add Ingredient|button|on_action=add_ingredient|>
 |>
 
-## Flyer
+## Prepare to Cook
 <|card|
-Flyer: <|{path}|file_selector|label=Upload Flyer|extensions=.png,.jpg|on_action=load_file|>
-<|Let it cook|button|on_action=generate_recipes|>
+<|{path}|file_selector|label=Upload Flyer|extensions=.png,.jpg|on_action=load_file|>
+<|Let it cook!|button|on_action=generate_recipes|>
 |>
 
 ## Recipes
@@ -44,9 +47,9 @@ Flyer: <|{path}|file_selector|label=Upload Flyer|extensions=.png,.jpg|on_action=
 <|{data}|table|columns=Name|show_all|rebuild|on_action=on_recipe_click|>
 |>
 
-
-        
+<|{"https://media4.giphy.com/media/WRXNJYnmTfaCUsU4Sw/giphy.gif?cid=6c09b952mdjomg6udjcjs7f2ybbepnrcks3zk55ymzfnt7u6&ep=v1_internal_gif_by_id&rid=giphy.gif&ct=s"}|image|>
 """
+
 # state modification
 def on_ingredient_change(state):
     current_ingredient.set_name(state.value)
@@ -56,10 +59,14 @@ def update_ingredient_display(new_ingredients: 'list[Ingredient]'):
     status = [(("info", ingredient.name)) for ingredient in new_ingredients]
 
 def add_ingredient():
-    to_add = Ingredient.from_existing(current_ingredient)
-    pantry.append(to_add)
-    current_ingredient.reset()
-    print(pantry)
+    if Ingredient.from_existing(current_ingredient).get_name() == "":
+        return
+    mydict = {"name":Ingredient.from_existing(current_ingredient).get_name()}
+    pantry.insert_one(mydict)
+    # current_ingredient.reset()
+    cursor = pantry.find({}).distinct('names')
+    for item in cursor:
+        print(item)
 
 def load_file(state):
     global file_path
@@ -73,13 +80,16 @@ def on_recipe_click(state, var_name, action, payload):
     except Exception as e:
         print(e)
 
-
 def generate_recipes(state):
+    pantry_items = []
+    cursor = pantry.find({}).distinct('names')
+    for item in cursor:
+        pantry_items.append(item)
+    print(pantry_items)
     global file_path
-    global data
     payload = {
         "path": file_path,
-        "pantry": [p.name for p in pantry]
+        "pantry": pantry_items
     }
     try:
         recipes_response = requests.post("http://localhost:8080/process", json=payload)
@@ -113,5 +123,10 @@ taipy.Gui(page=markdown).run(
     title="Let us cook",
     host='0.0.0.0',
     port=os.environ.get('PORT', '5000'),
-    use_reloader=True
+    use_reloader=True,
+    stylekit={
+        "color-secondary": "#4051B5",
+    },
+    css_file="main.css",
+    dark_mode=False,
 )

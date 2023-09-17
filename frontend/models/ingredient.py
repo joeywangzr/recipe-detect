@@ -11,6 +11,9 @@ class Ingredient:
     def set_name(self, new_name: str):
         self.name = new_name.strip(" .,")
     
+    def get_name(self):
+        return self.name
+
     def reset(self):
         self.name = ""
         self.price = None
