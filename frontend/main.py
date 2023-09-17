@@ -84,9 +84,9 @@ def add_ingredient():
     mydict = {"name":Ingredient.from_existing(current_ingredient).get_name()}
     pantry.insert_one(mydict)
     # current_ingredient.reset()
-    cursor = pantry.find({}).distinct('names')
-    for item in cursor:
-        print(item)
+    # cursor = pantry.find({}).distinct('names')
+    # for item in cursor:
+    #     print(item)
 
 def load_file(state):
     global file_path
@@ -108,10 +108,9 @@ def on_recipe_click(state, var_name, action, payload):
 
 def generate_recipes(state):
     pantry_items = []
-    cursor = pantry.find({}).distinct('names')
+    cursor = pantry.find({})
     for item in cursor:
-        pantry_items.append(item)
-    print(pantry_items)
+        pantry_items.append(item["name"])
     global file_path
     payload = {
         "path": file_path,
@@ -143,7 +142,6 @@ def generate_recipes(state):
         state.data = data
     except Exception as e:
         notify(state, "error", str(e))
-    
 
 taipy.Gui(page=markdown).run(
     title="Let us cook",
