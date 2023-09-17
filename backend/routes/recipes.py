@@ -18,11 +18,11 @@ def get_all_recipes():
 def insert_recipes():
     data = request.get_json()
     for raw in data:
-        recipe_name = raw.get("name")
-        recipe_ingredients = raw.get("ingredients") if raw.get("ingredients") is not None else []
-        recipe_steps = raw.get("steps") if raw.get("steps") is not None else []
+        recipe_name = raw.get("Name")
+        recipe_ingredients = raw.get("Ingredients") if raw.get("Ingredients") is not None else []
+        recipe_steps = raw.get("Steps") if raw.get("Steps") is not None else []
         if recipe_name is None or recipe_name == '':
-            return Response({"status": "error", "error": "Recipe name cannot be null."}, status=400)
+            return Response({"status": "error", "error": "Recipe name cannot be null."}, status=400, mimetype='application/json')
         recipe = Recipe(
             name=recipe_name,
             ingredients=recipe_ingredients,
@@ -31,7 +31,7 @@ def insert_recipes():
         db.session.add(recipe)
 
     db.session.commit()
-    return Response({"status": "success", "data": data}, status=200)
+    return Response({"status": "success", "data": data}, status=200, mimetype='application/json')
 
 @recipe_routes.route('/delete', methods=["DELETE"])
 def delete_recipes():
