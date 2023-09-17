@@ -1,3 +1,5 @@
+from collections import Counter
+from typing import List
 from google.cloud import vision
 import cohere  
 import os
@@ -44,14 +46,18 @@ def extract_grocery(flyer_text: str) -> str:
 def extract_flyer(image_uri: str) -> str:
     client = vision.ImageAnnotatorClient()
     response = client.annotate_image({
-      'image': {'source': {'image_uri': image_uri}},
+      'image': {'source': { 'image_uri': image_uri }},
       'features': [{'type_': vision.Feature.Type.TEXT_DETECTION}]
     })
+    return str(response.text_annotations[0].description)
 
-    return str(response.text_annotations)
+def extract_cost(flyer_text: str) -> float:
+    flyer_text = flyer_text.replace("\\\n", " ")
+    flyer_text = flyer_text.replace("\n", " ")
+    flyer_words = flyer_text.split(" ")
+    costs = [ float(w) for w in flyer_words if (len(w) >= 3 and w[-1] == '9') ]
+    return costs[0] / 100
 
 if __name__ == "__main__":
-    flyer_text = str(extract_flyer("https://raw.githubusercontent.com/recipede/recipe-detect/main/backend/grocery/crop_5.jpg"))
-    print(flyer_text)
-    print(extract_grocery(flyer_text))
-    print(is_food(flyer_text))
+    flyer_text = extract_flyer("https://raw.githubusercontent.com/recipede/recipe-detect/main/backend/grocery/crop_14.jpg")
+    print(extract_cost(flyer_text))
