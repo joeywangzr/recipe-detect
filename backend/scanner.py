@@ -66,7 +66,6 @@ def extract_cost(flyer_text: str) -> float:
     return costs[0] / 100 if costs[0] > 100 else costs[0]
 
 if __name__ == "__main__":
-    for i in range(14):
-        if i == 1 or i == 4: continue
+    for i in range(15):
         flyer_text = extract_flyer(f"https://raw.githubusercontent.com/recipede/recipe-detect/main/grocery/crop_{i}.jpg")
         print(extract_cost(flyer_text))
